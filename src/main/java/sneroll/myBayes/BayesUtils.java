@@ -1,43 +1,59 @@
 package sneroll.myBayes;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.math3.util.BigReal;
 
 public class BayesUtils {
 
 	public static CPTKey getKey(Set<Node> parents, Map<String, Object> data) {
 		
-		List<Object> keyValues = new ArrayList<Object>(parents.size());
+		LinkedHashMap<Node, Object> keyValues = new LinkedHashMap<Node, Object>(parents.size());
 		for (Node parent : parents) {
 			Object value = null;
 			
 			value = data.get(parent.getName());
 
-			keyValues.add(value);
+			keyValues.put(parent, value);
 		}
 		
 		return new CPTKey(keyValues);
 	}
 	
 	public static Set<CPTKey> getAllKeys(Node node) {
+		
+		return BayesUtils.getKeysWithMissingData(node, null);
+	}
+	
+	public static Set<CPTKey> getKeysWithMissingData(Node node, Map<String, Object> data) {
+		
 		Set<CPTKey> allKeys = null;
 		if (node.getParents().isEmpty()) {
 			allKeys = new HashSet<CPTKey>(1);
-			allKeys.add(new CPTKey(Collections.emptyList()));
+			allKeys.add(new CPTKey(new LinkedHashMap<Node, Object>()));
 			return allKeys;
 		}
 		
 		for (Node parent : node.getParents()) {
 			
+			Object parentDataValue = data == null? null : data.get(parent.getName());
+			boolean parentMissingData = data == null || parentDataValue == null;
+			
 			if (allKeys == null) {
 				allKeys = new HashSet<CPTKey>();
-				for (Object parentPV : parent.getPosibleValues()) {
-					List<Object> key = new ArrayList<Object>(1);
-					key.add(parentPV);
+				if (parentMissingData) {
+					for (Object parentPV : parent.getPosibleValues()) {
+						LinkedHashMap<Node, Object> key = new LinkedHashMap<Node, Object>(1);
+						key.put(parent, parentPV);
+						allKeys.add(new CPTKey(key));
+					}
+				} else {
+					LinkedHashMap<Node, Object> key = new LinkedHashMap<Node, Object>(1);
+					key.put(parent, parentDataValue);
 					allKeys.add(new CPTKey(key));
 				}
 			
@@ -45,10 +61,17 @@ public class BayesUtils {
 				Set<CPTKey> oldKeys = allKeys;
 				allKeys = new HashSet<CPTKey>();
 				for (CPTKey oldKey : oldKeys) {
-					for (Object parentPV : parent.getPosibleValues()) {
-						List<Object> key = new ArrayList<Object>(oldKey.getKey().size()+1);
-						key.addAll(oldKey.getKey());
-						key.add(parentPV);
+					if (parentMissingData) {
+						for (Object parentPV : parent.getPosibleValues()) {
+							LinkedHashMap<Node, Object> key = new LinkedHashMap<Node, Object>(oldKey.getKey().size()+1);
+							key.putAll(oldKey.getKey());
+							key.put(parent, parentPV);
+							allKeys.add(new CPTKey(key));
+						}
+					} else {
+						LinkedHashMap<Node, Object> key = new LinkedHashMap<Node, Object>(oldKey.getKey().size()+1);
+						key.putAll(oldKey.getKey());
+						key.put(parent, parentDataValue);
 						allKeys.add(new CPTKey(key));
 					}
 				}
@@ -56,7 +79,95 @@ public class BayesUtils {
 			}
 		}
 		
+
 		return allKeys;
 	}
+
+	public static Set<Map<String, Object>> getPosibleExamples(Set<Node> nodes, Map<String, Object> data) {
+		
+		Set<Map<String, Object>> allPosibleExamples = null;
+		
+		for (Node node : nodes) {
+			
+			if (allPosibleExamples == null) {
+				allPosibleExamples = new HashSet<Map<String,Object>>();
+				if (data.get(node.getName()) == null) {
+					for (Object pv : node.getPosibleValues()) {
+						Map<String, Object> example = new HashMap<String, Object>();
+						example.put(node.getName(), pv);
+						allPosibleExamples.add(example);
+					}
+				} else {
+					Map<String, Object> example = new HashMap<String, Object>();
+					example.put(node.getName(), data.get(node.getName()));
+					allPosibleExamples.add(example);
+				}
+			
+			} else {
+				Set<Map<String, Object>> oldPosibleExamples = allPosibleExamples;
+				allPosibleExamples = new HashSet<Map<String, Object>>();
+				for (Map<String, Object> oldExample : oldPosibleExamples) {
+					
+					if (data.get(node.getName()) == null) {
+						for (Object pv : node.getPosibleValues()) {
+							Map<String, Object> example = new HashMap<String, Object>();
+							example.putAll(oldExample);
+							example.put(node.getName(), pv);
+							allPosibleExamples.add(example);
+						}
+					} else {
+						Map<String, Object> example = new HashMap<String, Object>();
+						example.putAll(oldExample);
+						example.put(node.getName(), data.get(node.getName()));
+						allPosibleExamples.add(example);
+					}
+				}
+				
+			}
+		}
+		
+
+		return allPosibleExamples;
+	}
+	
+	public static String conditionalProbabilityTableToString(Map<Node, ConditionalProbabilityTable> cpts) {
+		StringBuilder sb = new StringBuilder();
+		
+		for (ConditionalProbabilityTable cpt : cpts.values()) {
+			sb.append("\n***********************\n");
+			sb.append("CPT for Node ").append(cpt.getNode().getName()).append("\n");
+			sb.append("\t Parents: ");
+			for (Node parent : cpt.getNode().getParents()) {
+				sb.append(" - ").append(parent.getName());
+			}
+			sb.append("\n\n");
+			sb.append("\t");
+			for (CPTKey key : cpt.getTable().keySet()) {
+				sb.append("\t").append(key);
+			}
+			for (Object pv : cpt.getNode().getPosibleValues()) {
+				sb.append("\n").append(pv);
+				for (CPTKey key : cpt.getTable().keySet()) {
+					sb.append("\t").append(cpt.getCPTInfo(key).getP(pv).doubleValue());
+				}
+			}
+			
+		}
+		
+		return sb.toString();
+	}
+	
+	
+
+	public static BigReal getP(Map<Node, ConditionalProbabilityTable> cpts, Node node, Map<String, Object> data) {
+		
+		ConditionalProbabilityTable cpt = cpts.get(node);
+		CPTKey key = BayesUtils.getKey(node.getParents(), data);
+		CPTInfo info = cpt.getCPTInfo(key);
+		
+		return info.getP(data.get(node.getName()));
+	}
+
+	
 	
 }

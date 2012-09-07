@@ -19,5 +19,11 @@ public class BayesianNetwork {
 	public Set<Node> getNodes() {
 		return nodes;
 	}
+
+	
+	public Set<Node> getNotDSeparatedNodes(Node node) {
+		//TODO fix DSeparation
+		return nodes;
+	}
 	
 }

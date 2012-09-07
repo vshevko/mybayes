@@ -13,31 +13,19 @@ import sneroll.myBayes.CPTKey;
 import sneroll.myBayes.ConditionalProbabilityTable;
 import sneroll.myBayes.Node;
 
-public class MaximumLikelihoodEstimation {
+public class MaximumLikelihoodEstimation extends ParameterEstimation{
 
 
-	private BayesianNetwork bn;
-	private Collection<Map<String, Object>> allData;
-	private Map<Node, ConditionalProbabilityTable> cpts;
-	
-	public MaximumLikelihoodEstimation(
-			BayesianNetwork bn,
-			Collection<Map<String, Object>> allData) {
-		this(bn, allData, new HashMap<Node, ConditionalProbabilityTable>());
-	}
-
-	public MaximumLikelihoodEstimation(
-			BayesianNetwork bn,
-			Collection<Map<String, Object>> allData,
-			Map<Node, ConditionalProbabilityTable> cpts) {
-		this.bn = bn;
-		this.allData = allData;
-		this.cpts = cpts;
+	public MaximumLikelihoodEstimation(BayesianNetwork bn, Collection<Map<String, Object>> allData) {
+		super(bn, allData);
 	}
 
 	public void solve() {
 
 		for (Map<String, Object> data : allData) {
+			
+			System.out.println(data);
+			
 			for (Node node : bn.getNodes()) {
 				ConditionalProbabilityTable cpt = getNodeCPT(node);
 
@@ -48,8 +36,7 @@ public class MaximumLikelihoodEstimation {
 				Object value = data.get(node.getName());
 
 				node.putPosibleValue(value);
-				info.addToDenominator(new BigReal(1));
-				info.addToNumerator(value, new BigReal(1));
+				info.addToExpectedNumer(value, BigReal.ONE);
 			}
 		}
 	}
@@ -63,32 +50,8 @@ public class MaximumLikelihoodEstimation {
 		return cpt;
 	}
 	
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		
-		for (ConditionalProbabilityTable cpt : cpts.values()) {
-			sb.append("\n***********************\n");
-			sb.append("CPT for Node ").append(cpt.getNode().getName()).append("\n");
-			sb.append("\t Parents: ");
-			for (Node parent : cpt.getNode().getParents()) {
-				sb.append(" - ").append(parent.getName());
-			}
-			sb.append("\n\n");
-			sb.append("\t");
-			for (CPTKey key : cpt.getTable().keySet()) {
-				sb.append("\t").append(key);
-			}
-			for (Object pv : cpt.getNode().getPosibleValues()) {
-				sb.append("\n").append(pv);
-				for (CPTKey key : cpt.getTable().keySet()) {
-					sb.append("\t").append(cpt.getCPTInfo(key).getP(pv).doubleValue());
-				}
-			}
-			
-		}
-		
-		return sb.toString();
+	public Map<Node, ConditionalProbabilityTable> getCpts() {
+		return cpts;
 	}
-
+	
 }
