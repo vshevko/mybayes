@@ -1,18 +1,18 @@
 package sneroll.myBayes.learning;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.Stack;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.math3.util.BigReal;
-import org.junit.internal.ExactComparisonCriteria;
 
 import sneroll.myBayes.BayesUtils;
 import sneroll.myBayes.BayesianNetwork;
@@ -22,34 +22,27 @@ import sneroll.myBayes.ConditionalProbabilityTable;
 import sneroll.myBayes.Node;
 
 
-public class ExpectationMaximization {
+public class ExpectationMaximization extends ParameterEstimation {
 
 	public static final int DEFAULT_ITERATIONS = 100;
 
 	private int iterations;
-	private BayesianNetwork bn;
-	private Collection<Map<String, Object>> allData;
-	private Collection<Map<String, Object>> expectedData;
-	
-	private MaximumLikelihoodEstimation currentParameters;
-	
 	public ExpectationMaximization(BayesianNetwork bn, Collection<Map<String, Object>> allData) {
 		this(bn, allData, DEFAULT_ITERATIONS);
 	}
 	
 	public ExpectationMaximization(BayesianNetwork bn, Collection<Map<String, Object>> allData, int iterations) {
-		this.bn = bn;
-		this.allData = allData;
+		super(bn, allData);
 		this.iterations = iterations;
 	}
 	
+	@Override
 	public void solve() {
 		init();
 		
 		boolean convergence = false;
 		for (int i = 0; i < iterations && !convergence; i ++) {
-			expectation();
-			maximization();
+			expectationMaximization();
 			// TODO check convergence
 			if (false) {
 				convergence = true;
@@ -58,19 +51,20 @@ public class ExpectationMaximization {
 	}
 	
 	void init() {
-		currentParameters = new MaximumLikelihoodEstimation(bn, allData);
+		Random ran = new Random(System.currentTimeMillis());
+		cpts = new HashMap<Node, ConditionalProbabilityTable>();
 		
 		for (Node node : bn.getNodes()) {
 
 			Set<CPTKey> allKeys = BayesUtils.getAllKeys(node);
 			
-			ConditionalProbabilityTable cpt = currentParameters.getNodeCPT(node);
+			ConditionalProbabilityTable cpt = getNodeCPT(cpts, node);
 			
 			for (CPTKey key : allKeys) {
 				
 				SortedSet<BigReal> randomInitialProbs = new TreeSet<BigReal>();
 				for (int i = 0; i < node.getPosibleValues().size() - 1; i ++) {
-					randomInitialProbs.add(new BigReal(Math.random()));
+					randomInitialProbs.add(new BigReal(ran.nextDouble()));
 				}
 				randomInitialProbs.add(BigReal.ONE);
 				
@@ -91,26 +85,86 @@ public class ExpectationMaximization {
 		
 	}
 	
-	public MaximumLikelihoodEstimation getCurrentParameters() {
-		return currentParameters;
+	public void expectationMaximization() {
+		Map<Node, ConditionalProbabilityTable> newParameters = new HashMap<Node, ConditionalProbabilityTable>();
+		
+		for (Map<String, Object> data : allData) {
+			for (Node node : bn.getNodes()) {
+				
+				ConditionalProbabilityTable newCpt = getNodeCPT(newParameters, node);
+				
+				boolean completeEvidence = isCompleteEvidence(data, node);
+				
+				if (!completeEvidence) {
+
+					Set<Map<String, Object>> posibilities = BayesUtils.getPosibleExamples(bn.getNotDSeparatedNodes(node), data);
+					
+					Map<Map<String, Object>, BigReal> exampleWeights = new HashMap<Map<String, Object>, BigReal>();
+					BigReal normalizer = BigReal.ZERO;
+					for (Map<String, Object> posibleData : posibilities) {
+					
+						BigReal exampleWeight = evaluateNetwork(posibleData);
+						exampleWeights.put(posibleData, exampleWeight);
+						normalizer = normalizer.add(exampleWeight);
+					}
+		
+					for (Map<String, Object> posibleData : posibilities) {
+						CPTKey key = BayesUtils.getKey(node.getParents(), posibleData);
+
+						CPTInfo info = newCpt.getCPTInfo(key);
+
+						Object value = posibleData.get(node.getName());
+						BigReal exampleWeight = exampleWeights.get(posibleData).divide(normalizer);
+
+						info.addToExpectedNumer(value, exampleWeight);
+					}
+					
+				} else {
+
+					CPTKey key = BayesUtils.getKey(node.getParents(), data);
+
+					CPTInfo info = newCpt.getCPTInfo(key);
+
+					Object value = data.get(node.getName());
+
+					node.putPosibleValue(value);
+					info.addToExpectedNumer(value, BigReal.ONE);
+				}
+			}
+		}
+		cpts = newParameters;
+	}
+
+	private boolean isCompleteEvidence(Map<String, Object> data, Node node) {
+		boolean completeEvidence = true;
+		Set<Node> nonDSeparated = bn.getNotDSeparatedNodes(node);
+		for (Node joinNode : nonDSeparated) {
+			if (data.get(joinNode.getName()) == null) {
+				completeEvidence = false;
+			}
+		}
+		return completeEvidence;
+	}
+
+	private List<Object> getNodeValuesToAnalyse(Node node, Map<String, Object> data) {
+		List<Object> toReturn;
+		Object value = data.get(node.getName());
+		if (value != null) {
+			toReturn = new ArrayList<Object>();
+			toReturn.add(value);
+		} else {
+			toReturn = new ArrayList<Object>();
+			toReturn.addAll(node.getPosibleValues());
+		}
+		return toReturn;
+	}
+
+	public Map<Node, ConditionalProbabilityTable> getCurrentParameters() {
+		return cpts;
 	}
 	
-	void expectation() {
-		
-		expectedData = new LinkedList<Map<String, Object>>();
-		for (Map<String, Object> d : allData) {
-			Map<String, Object> expected = addExpectationData(d);
-			expectedData.add(expected);
-		}
+	public void setCurrentParameters(Map<Node, ConditionalProbabilityTable> currentParameters) {
+		this.cpts = currentParameters;
 	}
-
-	Map<String, Object> addExpectationData(Map<String, Object> data) {
-		
-		
-		return null;
-	}
-
-	private void maximization() {
-		
-	}
+	
 }

@@ -1,6 +1,10 @@
 package sneroll.myBayes;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -31,21 +35,34 @@ public class BayesianNetworkTest {
 	
 	@Test
 	public void test_bayesUtils_allKeys() {
-		Node a = new Node("a");
-		a.putPosibleValues(new String[]{"1", "2"});
-		Node b = new Node("b");
-		b.putPosibleValues(new String[]{"1", "2"});
-		Node c = new Node("c");
-		c.putPosibleValues(new String[]{"1", "2"});
+		Node x1 = new Node("x1");
+		x1.putPosibleValues(new String[]{"1", "2"});
+		Node x2 = new Node("x2");
+		x2.putPosibleValues(new String[]{"1", "2"});
+		Node x3 = new Node("x3");
+		x3.putPosibleValues(new String[]{"1", "2"});
 		
 		BayesianNetwork bn = new BayesianNetwork();
-		bn.addEdge(a, b);
-		bn.addEdge(c, b);
+		bn.addEdge(x1, x3);
+		bn.addEdge(x2, x3);
 		
 		
-		Set<CPTKey> keys = BayesUtils.getAllKeys(b);
+		Set<CPTKey> keys = BayesUtils.getAllKeys(x3);
+		Assert.assertEquals(x1.getPosibleValues().size()*x3.getPosibleValues().size(), keys.size());
+
 		
-		Assert.assertEquals(a.getPosibleValues().size()*c.getPosibleValues().size(), keys.size());
+		keys = BayesUtils.getKeysWithMissingData(x3, buildExample("1",null, "1"));
+		Assert.assertEquals(x1.getPosibleValues().size(), keys.size());
 		
+		keys = BayesUtils.getKeysWithMissingData(x3, buildExample(null,null, "1s"));
+		Assert.assertEquals(x1.getPosibleValues().size()*x3.getPosibleValues().size(), keys.size());
+	}
+	
+	private Map<String, Object> buildExample(String x1, String x2, String x3) {
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("x1", x1);
+		obj.put("x2", x2);
+		obj.put("x3", x3);
+		return obj;
 	}
 }

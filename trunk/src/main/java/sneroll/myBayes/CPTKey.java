@@ -1,19 +1,19 @@
 package sneroll.myBayes;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class CPTKey {
 
-	private List<Object> key;
+	private LinkedHashMap<Node, Object> key;
 	
-	public CPTKey(List<Object> key) {
+	public CPTKey(LinkedHashMap<Node, Object> key) {
 		this.key = key;
 	}
 	
-	public List<Object> getKey() {
+	public LinkedHashMap<Node, Object> getKey() {
 		return key;
 	}
 	
@@ -21,7 +21,7 @@ public class CPTKey {
 	public int hashCode() {
 		
 		HashCodeBuilder hcb = new HashCodeBuilder();
-		hcb.append(key.toArray());
+		hcb.append(key.values().toArray());
 		
 		return hcb.build();
 	}
@@ -37,7 +37,7 @@ public class CPTKey {
 		CPTKey other = (CPTKey) obj;
 		
 		EqualsBuilder eb = new EqualsBuilder();
-		eb.append(this.key.toArray(), other.key.toArray());
+		eb.append(this.key.values().toArray(), other.key.values().toArray());
 		
 		return eb.build();
 	}
@@ -51,7 +51,7 @@ public class CPTKey {
 		}
 		
 		boolean first = true;
-		for(Object key : this.key) {
+		for(Object key : this.key.values()) {
 			if (!first)
 				sb.append("/");
 			sb.append(key);
