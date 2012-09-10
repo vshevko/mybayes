@@ -65,4 +65,24 @@ public class BayesianNetworkTest {
 		obj.put("x3", x3);
 		return obj;
 	}
+	
+	@Test
+	public void test_DAGTester() {
+		Node x1 = new Node("x1");
+		Node x2 = new Node("x2");
+		Node x3 = new Node("x3");
+		
+		BayesianNetwork bn = new BayesianNetwork();
+		bn.addEdge(x1, x3);
+		bn.addEdge(x2, x3);
+		
+		Assert.assertEquals(true, bn.isDAG());
+		
+		bn = new BayesianNetwork();
+		bn.addEdge(x1, x2);
+		bn.addEdge(x2, x3);
+		bn.addEdge(x3, x1);
+		
+		Assert.assertEquals(false, bn.isDAG());
+	}
 }

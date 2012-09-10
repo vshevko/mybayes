@@ -52,17 +52,19 @@ public class Node implements Comparable<Node>{
 	public Set<Node> getParents() {
 		if (parents == null)
 			return Collections.emptySet();
-		return parents;
+		
+		return Collections.unmodifiableSet(parents);
 	}
 	
 	public Set<Node> getChildren() {
 		if (children == null)
 			return Collections.emptySet();
-		return children;
+		
+		return Collections.unmodifiableSet(children);
 	}
 	
 	public Set<Object> getPosibleValues() {
-		return posibleValues;
+		return Collections.unmodifiableSet(posibleValues);
 	}
 
 	@Override
