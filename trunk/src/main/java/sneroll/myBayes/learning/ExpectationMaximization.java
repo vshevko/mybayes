@@ -25,7 +25,7 @@ import sneroll.myBayes.Node;
 public class ExpectationMaximization extends ParameterEstimation {
 
 	public static final int DEFAULT_ITERATIONS = 100;
-
+	
 	private int iterations;
 	public ExpectationMaximization(BayesianNetwork bn, Collection<Map<String, Object>> allData) {
 		this(bn, allData, DEFAULT_ITERATIONS);
@@ -44,9 +44,6 @@ public class ExpectationMaximization extends ParameterEstimation {
 		for (int i = 0; i < iterations && !convergence; i ++) {
 			expectationMaximization();
 			// TODO check convergence
-			if (false) {
-				convergence = true;
-			}
 		}
 	}
 	
@@ -144,19 +141,6 @@ public class ExpectationMaximization extends ParameterEstimation {
 			}
 		}
 		return completeEvidence;
-	}
-
-	private List<Object> getNodeValuesToAnalyse(Node node, Map<String, Object> data) {
-		List<Object> toReturn;
-		Object value = data.get(node.getName());
-		if (value != null) {
-			toReturn = new ArrayList<Object>();
-			toReturn.add(value);
-		} else {
-			toReturn = new ArrayList<Object>();
-			toReturn.addAll(node.getPosibleValues());
-		}
-		return toReturn;
 	}
 
 	public Map<Node, ConditionalProbabilityTable> getCurrentParameters() {

@@ -1,8 +1,8 @@
 package sneroll.myBayes;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class BayesUtils {
 		
 		Set<CPTKey> allKeys = null;
 		if (node.getParents().isEmpty()) {
-			allKeys = new HashSet<CPTKey>(1);
+			allKeys = new LinkedHashSet<CPTKey>(1);
 			allKeys.add(new CPTKey(new LinkedHashMap<Node, Object>()));
 			return allKeys;
 		}
@@ -44,7 +44,7 @@ public class BayesUtils {
 			boolean parentMissingData = data == null || parentDataValue == null;
 			
 			if (allKeys == null) {
-				allKeys = new HashSet<CPTKey>();
+				allKeys = new LinkedHashSet<CPTKey>();
 				if (parentMissingData) {
 					for (Object parentPV : parent.getPosibleValues()) {
 						LinkedHashMap<Node, Object> key = new LinkedHashMap<Node, Object>(1);
@@ -59,7 +59,7 @@ public class BayesUtils {
 			
 			} else {
 				Set<CPTKey> oldKeys = allKeys;
-				allKeys = new HashSet<CPTKey>();
+				allKeys = new LinkedHashSet<CPTKey>();
 				for (CPTKey oldKey : oldKeys) {
 					if (parentMissingData) {
 						for (Object parentPV : parent.getPosibleValues()) {
@@ -90,7 +90,7 @@ public class BayesUtils {
 		for (Node node : nodes) {
 			
 			if (allPosibleExamples == null) {
-				allPosibleExamples = new HashSet<Map<String,Object>>();
+				allPosibleExamples = new LinkedHashSet<Map<String,Object>>();
 				if (data.get(node.getName()) == null) {
 					for (Object pv : node.getPosibleValues()) {
 						Map<String, Object> example = new HashMap<String, Object>();
@@ -105,7 +105,7 @@ public class BayesUtils {
 			
 			} else {
 				Set<Map<String, Object>> oldPosibleExamples = allPosibleExamples;
-				allPosibleExamples = new HashSet<Map<String, Object>>();
+				allPosibleExamples = new LinkedHashSet<Map<String, Object>>();
 				for (Map<String, Object> oldExample : oldPosibleExamples) {
 					
 					if (data.get(node.getName()) == null) {
@@ -138,10 +138,9 @@ public class BayesUtils {
 			sb.append("CPT for Node ").append(cpt.getNode().getName()).append("\n");
 			sb.append("\t Parents: ");
 			for (Node parent : cpt.getNode().getParents()) {
-				sb.append(" - ").append(parent.getName());
+				sb.append(" / ").append(parent.getName());
 			}
 			sb.append("\n\n");
-			sb.append("\t");
 			for (CPTKey key : cpt.getTable().keySet()) {
 				sb.append("\t").append(key);
 			}
