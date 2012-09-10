@@ -1,7 +1,6 @@
 package sneroll.myBayes.learning;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math3.util.BigReal;
@@ -20,7 +19,7 @@ public class MaximumLikelihoodEstimation extends ParameterEstimation{
 		super(bn, allData);
 	}
 
-	public void solve() {
+	public void process() {
 
 		for (Map<String, Object> data : allData) {
 			

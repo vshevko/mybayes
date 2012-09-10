@@ -15,7 +15,12 @@ public abstract class ParameterEstimation {
 
 	protected BayesianNetwork bn;
 
-	public abstract void solve();
+	final public void solve() {
+		assert (bn.isDAG());
+		process();
+	}
+	
+	abstract void process();
 
 	protected Collection<Map<String, Object>> allData;
 	protected Map<Node, ConditionalProbabilityTable> cpts;

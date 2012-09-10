@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.commons.math3.util.BigReal;
 
-import sneroll.myBayes.BayesUtils;
 import sneroll.myBayes.BayesianNetwork;
 import sneroll.myBayes.CPTInfo;
 import sneroll.myBayes.CPTKey;
@@ -20,8 +19,8 @@ public class BayesianEstimation extends MaximumLikelihoodEstimation {
 
 
 	@Override
-	public void solve() {
-		super.solve();
+	public void process() {
+		super.process();
 		
 		for (Node node : bn.getNodes()) {
 			ConditionalProbabilityTable cpt = getNodeCPT(node);

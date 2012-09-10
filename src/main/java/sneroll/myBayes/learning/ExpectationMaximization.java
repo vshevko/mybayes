@@ -1,10 +1,8 @@
 package sneroll.myBayes.learning;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
@@ -37,7 +35,7 @@ public class ExpectationMaximization extends ParameterEstimation {
 	}
 	
 	@Override
-	public void solve() {
+	public void process() {
 		init();
 		
 		boolean convergence = false;
@@ -94,7 +92,7 @@ public class ExpectationMaximization extends ParameterEstimation {
 				
 				if (!completeEvidence) {
 
-					Set<Map<String, Object>> posibilities = BayesUtils.getPosibleExamples(bn.getNotDSeparatedNodes(node), data);
+					Set<Map<String, Object>> posibilities = BayesUtils.getPosibleExamples(bn.getNodes(), data);
 					
 					Map<Map<String, Object>, BigReal> exampleWeights = new HashMap<Map<String, Object>, BigReal>();
 					BigReal normalizer = BigReal.ZERO;
@@ -134,8 +132,8 @@ public class ExpectationMaximization extends ParameterEstimation {
 
 	private boolean isCompleteEvidence(Map<String, Object> data, Node node) {
 		boolean completeEvidence = true;
-		Set<Node> nonDSeparated = bn.getNotDSeparatedNodes(node);
-		for (Node joinNode : nonDSeparated) {
+		Set<Node> nondes = bn.getNodes();
+		for (Node joinNode : nondes) {
 			if (data.get(joinNode.getName()) == null) {
 				completeEvidence = false;
 			}
