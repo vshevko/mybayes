@@ -2,17 +2,17 @@ package sneroll.myBayes;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Node implements Comparable<Node>{
 	
-	private Set<Object> posibleValues = new HashSet<Object>();
+	private Set<Object> posibleValues = new LinkedHashSet<Object>();
 	private SortedSet<Node> parents;
 	private SortedSet<Node> children;
-	private String name;
+	private final String name;
 	
 	public Node(String name) {
 		this.name = name;

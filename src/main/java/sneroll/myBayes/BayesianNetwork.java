@@ -8,12 +8,16 @@ public class BayesianNetwork {
 	
 	private Set<Node> nodes  = new TreeSet<Node>();
 
+	public void addNode(Node node) {
+		nodes.add(node);
+	}
+	
 	public void addEdge(Node parent, Node child) {
 		parent.addChild(child);
 		child.addParent(parent);
 		
-		nodes.add(parent);
-		nodes.add(child);
+		addNode(parent);
+		addNode(child);
 	}
 	
 	public Set<Node> getNodes() {

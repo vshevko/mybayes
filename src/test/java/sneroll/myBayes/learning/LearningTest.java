@@ -110,11 +110,11 @@ public class LearningTest {
 		incompleteData.add(buildExample( "1",null, "1"));
 		incompleteData.add(buildExample( "2",null, "2"));
 		
-		ExpectationMaximization em = new ExpectationMaximization(bn, incompleteData, 1);
+		ExpectationMaximization em = new ExpectationMaximization(bn, incompleteData);
 		em.setCurrentParameters(mle.getCpts());
 		em.expectationMaximization();
-		
 		System.out.println(em);
+		
 		System.out.println();
 	}
 	
