@@ -9,7 +9,7 @@ import org.apache.commons.math3.util.BigReal;
 public class CPTInfo {
 
 	private Map<Object, BigReal> numerator;
-	private BigReal denominator;
+	private BigReal denominator = BigReal.ONE;
 	
 	public Set<Object> getX() {
 		return numerator.keySet();

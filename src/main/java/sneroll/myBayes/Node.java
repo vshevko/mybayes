@@ -22,17 +22,20 @@ public class Node implements Comparable<Node>{
 		return name;
 	}
 
-	public void putPosibleValue(Object value) {
+	public Node putPosibleValue(Object value) {
 		posibleValues.add(value);
+		return this;
 	}
 	
-	public void putPosibleValues(Collection<Object> values) {
+	public Node putPosibleValues(Collection<Object> values) {
 		posibleValues.addAll(values);
+		return this;
 	}
 	
-	public void putPosibleValues(Object[] values) {
+	public Node putPosibleValues(Object[] values) {
 		for (Object value : values)
 			putPosibleValue(value);
+		return this;
 	}
 	
 	public void addParent(Node parent) {

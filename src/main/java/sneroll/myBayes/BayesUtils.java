@@ -10,6 +10,30 @@ import org.apache.commons.math3.util.BigReal;
 
 public class BayesUtils {
 
+	public static ConditionalProbabilityTable buildCPTFromMatrix(Node node, double[][] p) {
+		
+		assert(p.length == node.getPosibleValues().size());
+		Set<CPTKey> parentKeys = getAllKeys(node);
+		for (double[] row : p) {
+			assert(row.length == parentKeys.size());
+		}
+		
+		ConditionalProbabilityTable cpt = new ConditionalProbabilityTable(node);
+		
+		int col = 0;
+		for (CPTKey key : parentKeys) {
+			CPTInfo info = cpt.getCPTInfo(key);
+			int row = 0;
+			for (Object pv : node.getPosibleValues()) {
+				info.setNumerator(pv, new BigReal(p[row][col]));
+				row ++;
+			}
+			col ++;
+		}
+		
+		return cpt;
+	}
+	
 	public static CPTKey getKey(Set<Node> parents, Map<String, Object> data) {
 		
 		LinkedHashMap<Node, Object> keyValues = new LinkedHashMap<Node, Object>(parents.size());
