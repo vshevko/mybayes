@@ -55,6 +55,9 @@ public class BayesUtils {
 	
 	public static Set<CPTKey> getKeysWithMissingData(Node node, Map<String, Object> data) {
 		
+		if (node ==null)
+			System.out.println();
+		
 		Set<CPTKey> allKeys = null;
 		if (node.getParents().isEmpty()) {
 			allKeys = new LinkedHashSet<CPTKey>(1);
@@ -188,7 +191,9 @@ public class BayesUtils {
 		CPTKey key = BayesUtils.getKey(node.getParents(), data);
 		CPTInfo info = cpt.getCPTInfo(key);
 		
-		return info.getP(data.get(node.getName()));
+		Object value = data.get(node.getName());
+		
+		return info.getP(value);
 	}
 
 	

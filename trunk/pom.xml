@@ -30,5 +30,15 @@
 			<artifactId>commons-collections</artifactId>
 			<version>3.2.1</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jsci</groupId>
+			<artifactId>jsci</artifactId>
+			<version>1.2</version>
+		</dependency>
 	</dependencies>
 </project>
