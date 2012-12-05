@@ -8,6 +8,7 @@ import org.apache.commons.math3.util.BigReal;
 
 public class CPTInfo {
 
+	private Map<Object, BigReal> calculatedP = new HashMap<Object, BigReal>();
 	private Map<Object, BigReal> numerator;
 	private BigReal denominator = BigReal.ONE;
 	
@@ -49,11 +50,16 @@ public class CPTInfo {
 	}
 	
 	public BigReal getP(Object value) {
-		BigReal br = numerator.get(value);
-		if (br == null) {
-			return BigReal.ZERO;
+		BigReal p = calculatedP.get(value);
+		if (p == null) {
+			BigReal br = numerator.get(value);
+			if (br == null) {
+				return BigReal.ZERO;
+			}
+			p = br.divide(denominator);
+			calculatedP.put(value, p);
 		}
-		return br.divide(denominator);
+		return p;
 	}
 	
 	@Override

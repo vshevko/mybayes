@@ -93,7 +93,7 @@ public class BIFReader implements BayesianNetworkReader {
 				nodes.put(tempVal, currentNode);
 				
 			}else if (qName.equalsIgnoreCase("OUTCOME")) {
-				currentNode.putPosibleValue(tempVal);
+				currentNode.addPosibleValue(tempVal);
 				
 			}else if (qName.equalsIgnoreCase("FOR")) {
 				currentNode = nodes.get(tempVal);

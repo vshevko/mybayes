@@ -33,11 +33,11 @@ public class BayesianNetworkTest {
 	@Test
 	public void test_buildCPTFromMatrix() {
 		Node x1 = new Node("x1");
-		x1.putPosibleValues(new String[]{"1", "2"});
+		x1.addPosibleValues(new String[]{"1", "2"});
 		Node x2 = new Node("x2");
-		x2.putPosibleValues(new String[]{"1", "2"});
+		x2.addPosibleValues(new String[]{"1", "2"});
 		Node x3 = new Node("x3");
-		x3.putPosibleValues(new String[]{"x3_1", "x3_2"});
+		x3.addPosibleValues(new String[]{"x3_1", "x3_2"});
 		
 		BayesianNetwork bn = new BayesianNetwork();
 		bn.addEdge(x1, x3);
@@ -69,11 +69,11 @@ public class BayesianNetworkTest {
 	@Test
 	public void test_bayesUtils_allKeys() {
 		Node x1 = new Node("x1");
-		x1.putPosibleValues(new String[]{"1", "2"});
+		x1.addPosibleValues(new String[]{"1", "2"});
 		Node x2 = new Node("x2");
-		x2.putPosibleValues(new String[]{"1", "2"});
+		x2.addPosibleValues(new String[]{"1", "2"});
 		Node x3 = new Node("x3");
-		x3.putPosibleValues(new String[]{"1", "2"});
+		x3.addPosibleValues(new String[]{"1", "2"});
 		
 		BayesianNetwork bn = new BayesianNetwork();
 		bn.addEdge(x1, x3);

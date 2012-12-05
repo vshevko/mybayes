@@ -1,15 +1,16 @@
 package sneroll.myBayes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Node implements Comparable<Node>{
 	
-	private Set<Object> posibleValues = new LinkedHashSet<Object>();
+	private ArrayList<Object> posibleValues = new ArrayList<Object>();
 	private SortedSet<Node> parents;
 	private SortedSet<Node> children;
 	private final String name;
@@ -22,19 +23,21 @@ public class Node implements Comparable<Node>{
 		return name;
 	}
 
-	public Node putPosibleValue(Object value) {
-		posibleValues.add(value);
+	public Node addPosibleValue(Object value) {
+		if (!posibleValues.contains(value))
+			posibleValues.add(value);
 		return this;
 	}
 	
-	public Node putPosibleValues(Collection<Object> values) {
-		posibleValues.addAll(values);
-		return this;
-	}
-	
-	public Node putPosibleValues(Object[] values) {
+	public Node addPosibleValues(Collection<Object> values) {
 		for (Object value : values)
-			putPosibleValue(value);
+			addPosibleValue(value);
+		return this;
+	}
+	
+	public Node addPosibleValues(Object[] values) {
+		for (Object value : values)
+			addPosibleValue(value);
 		return this;
 	}
 	
@@ -66,8 +69,8 @@ public class Node implements Comparable<Node>{
 		return Collections.unmodifiableSet(children);
 	}
 	
-	public Set<Object> getPosibleValues() {
-		return Collections.unmodifiableSet(posibleValues);
+	public List<Object> getPosibleValues() {
+		return Collections.unmodifiableList(posibleValues);
 	}
 
 	@Override

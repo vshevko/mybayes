@@ -122,7 +122,7 @@ public class ExpectationMaximization extends ParameterEstimation {
 
 					Object value = data.get(node.getName());
 
-					node.putPosibleValue(value);
+					node.addPosibleValue(value);
 					info.addToExpectedNumer(value, BigReal.ONE);
 				}
 			}
