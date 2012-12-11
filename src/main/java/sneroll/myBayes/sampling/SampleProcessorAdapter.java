@@ -13,7 +13,8 @@ public class SampleProcessorAdapter implements SampleProcessor {
 	public void processTempSample(Map<String, Object> data) {
 	}
 
-	public void end() {
+	public String end() {
+		return null;
 	}
 
 }

@@ -62,8 +62,9 @@ public class FileWritterSampleProcessor extends SampleProcessorAdapter {
 	}
 
 	@Override
-	public void end() {
+	public String end() {
 		printToOutputFile();
+		return outputFile.toString();
 	}
 	
 }

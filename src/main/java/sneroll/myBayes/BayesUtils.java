@@ -1,5 +1,6 @@
 package sneroll.myBayes;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -160,6 +161,8 @@ public class BayesUtils {
 	public static String conditionalProbabilityTableToString(Map<Node, ConditionalProbabilityTable> cpts) {
 		StringBuilder sb = new StringBuilder();
 		
+		DecimalFormat df = new DecimalFormat("#.#####");
+		
 		for (ConditionalProbabilityTable cpt : cpts.values()) {
 			sb.append("\n***********************\n");
 			sb.append("CPT for Node ").append(cpt.getNode().getName()).append("\n");
@@ -174,7 +177,7 @@ public class BayesUtils {
 			for (Object pv : cpt.getNode().getPosibleValues()) {
 				sb.append("\n").append(pv);
 				for (CPTKey key : cpt.getTable().keySet()) {
-					sb.append("\t").append(cpt.getCPTInfo(key).getP(pv).doubleValue());
+					sb.append("\t").append(df.format(cpt.getCPTInfo(key).getP(pv).doubleValue()));
 				}
 			}
 			

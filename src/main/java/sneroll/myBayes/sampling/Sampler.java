@@ -1,8 +1,9 @@
 package sneroll.myBayes.sampling;
 
 import java.util.Random;
+import java.util.concurrent.Callable;
 
-public interface Sampler {
+public interface Sampler extends Callable<String> {
 
 	public static final Random random = new Random(System.currentTimeMillis());
 
@@ -12,6 +13,6 @@ public interface Sampler {
 
 	public abstract Sampler setSamplingFreq(int samplingFreq);
 
-	public abstract void sample();
+	//public abstract void sample();
 
 }
