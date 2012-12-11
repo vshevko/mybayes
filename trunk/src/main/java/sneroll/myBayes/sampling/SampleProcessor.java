@@ -24,7 +24,8 @@ public interface SampleProcessor {
 
 	/**
 	 * sampling have ended;
+	 * @return a string with the final status information
 	 */
-	void end();
+	String end();
 	
 }

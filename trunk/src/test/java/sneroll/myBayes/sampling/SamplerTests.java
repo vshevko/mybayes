@@ -59,7 +59,7 @@ public class SamplerTests {
 		sampler.modifyData(x1, data);
 		System.out.println();
 		
-		sampler.sample();
+		sampler.call();
 	}
 	
 }

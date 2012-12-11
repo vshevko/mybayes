@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.math3.util.BigReal;
 
@@ -16,6 +17,8 @@ import sneroll.myBayes.Node;
 
 public class GibbsSampler implements Sampler {
 
+	
+	
 	private int iterations = 500000;
 	private int samplingFreq = 100;
 	private int burin = iterations/4;
@@ -68,7 +71,7 @@ public class GibbsSampler implements Sampler {
 	/* (non-Javadoc)
 	 * @see sneroll.myBayes.sampling.Sampler#sample()
 	 */
-	public void sample() {
+	public String call() {
 		
 		processor.init();
 		
@@ -93,7 +96,7 @@ public class GibbsSampler implements Sampler {
 			i ++;
 		}
 		
-		processor.end();
+		return processor.end();
 	}
 
 
