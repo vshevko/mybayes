@@ -185,8 +185,6 @@ public class BayesUtils {
 		
 		return sb.toString();
 	}
-	
-	
 
 	public static BigReal getP(Map<Node, ConditionalProbabilityTable> cpts, Node node, Map<String, Object> data) {
 		
@@ -198,6 +196,29 @@ public class BayesUtils {
 		
 		return info.getP(value);
 	}
+
+	public static double getLogP(Map<Node, ConditionalProbabilityTable> cpts,
+			Node node, Map<String, Object> data) {
+		
+		return Math.log(getP(cpts, node, data).doubleValue());
+	}
+	
+	public static double getP(BayesianNetwork bn, Map<Node, ConditionalProbabilityTable> cpts, Map<String, Object> data) {
+		return Math.exp(getLogP(bn, cpts, data));
+	}
+	
+	public static double getLogP(BayesianNetwork bn, Map<Node, ConditionalProbabilityTable> cpts, Map<String, Object> data) {
+		
+		double logP = 0;
+		for (Node node : bn.getNodes()) {
+			logP += getLogP(cpts, node, data);
+		}
+		
+		return logP;
+	}
+	
+	
+	
 
 	
 	
