@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.math3.util.BigReal;
 
@@ -29,15 +28,25 @@ public class GibbsSampler implements Sampler {
 	private List<Node> unkowns;
 	private SampleProcessor processor;
 	
+	Map<Node, Object> initialData;
+	
 	public GibbsSampler(BayesianNetwork bn,
 			Map<Node, ConditionalProbabilityTable> cpts,
 			Map<Node, Object> evidence,
+			SampleProcessor processor) {
+		this(bn, cpts, evidence, new HashMap<Node, Object>(), processor);
+	}
+
+	public GibbsSampler(BayesianNetwork bn,
+			Map<Node, ConditionalProbabilityTable> cpts,
+			Map<Node, Object> evidence, Map<Node, Object> initialData,
 			SampleProcessor processor) {
 		
 		this.bn = bn;
 		this.cpts = cpts;
 		this.evidence = evidence;
 		this.processor = processor;
+		this.initialData = initialData;
 		
 		this.unkowns = new ArrayList<Node>();
 		this.unkowns.addAll(this.bn.getNodes());
@@ -66,6 +75,10 @@ public class GibbsSampler implements Sampler {
 	public Sampler setSamplingFreq(int samplingFreq) {
 		this.samplingFreq = samplingFreq;
 		return this;
+	}
+	
+	public void setInitialData(Map<Node, Object> initialData) {
+		this.initialData = initialData;
 	}
 	
 	/* (non-Javadoc)
@@ -133,19 +146,23 @@ public class GibbsSampler implements Sampler {
 			data.put(e.getKey().getName(), e.getValue());
 		}
 		for (Node unknown : unkowns) {
-			int index = random.nextInt(unknown.getPosibleValues().size());
-			Object value = unknown.getPosibleValues().get(index);
-			data.put(unknown.getName(), value);
+			if (initialData.containsKey(unknown)) {
+				data.put(unknown.getName(), initialData.get(unknown));
+			} else {
+				int index = random.nextInt(unknown.getPosibleValues().size());
+				Object value = unknown.getPosibleValues().get(index);
+				data.put(unknown.getName(), value);
+			}
 		}
 	}
 
 	public double evaluateMarkovBlanket(Node baseNode, Map<String, Object> data) {
-		double p = BayesUtils.getP(cpts, baseNode, data).doubleValue();
+		double p = BayesUtils.getLogP(cpts, baseNode, data);
 		for (Node node : baseNode.getChildren()) {
-			BigReal nodeP = BayesUtils.getP(cpts, node, data);
-			p *= nodeP.doubleValue();
+			double nodeLogP = BayesUtils.getLogP(cpts, node, data);
+			p += nodeLogP;
 		}
-		return p;
+		return Math.exp(p);
 	}
 	
 }
